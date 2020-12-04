@@ -4,10 +4,25 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\EmpruntRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
- * @ApiResource
+ * @ApiResource(
+ *      attributes={
+ *          "order": {"createdAt":"asc"}
+ *      },
+ *     collectionOperations={"get"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"},"post"={"security"="is_granted('ROLE_ADMIN')"}},
+ *     itemOperations={"get"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"},"delete"={"security"="is_granted('ROLE_ADMIN')"},"put"={"security"="is_granted('ROLE_ADMIN')"},"patch"={"security"="is_granted('ROLE_ADMIN')"}}
+ * )
+ * @ApiFilter(
+ *      SearchFilter::class, properties={"rendu":"partial","createdAt":"partial","User.nom":"partial","User.prenom":"partial","User.email":"partial"}
+ * )
+ * @ApiFilter(
+ *      OrderFilter::class
+ * )
  * @ORM\Entity(repositoryClass=EmpruntRepository::class)
  */
 class Emprunt
@@ -25,18 +40,18 @@ class Emprunt
     private $createdAt;
 
     /**
-     * @ORM\Column(type="binary")
+     * @ORM\Column(type="boolean")
      */
     private $rendu;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="emprunts")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="Emprunts")
      * @ORM\JoinColumn(nullable=false)
      */
     private $User;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Exemplaire::class, inversedBy="emprunt")
+     * @ORM\ManyToOne(targetEntity=Exemplaire::class, inversedBy="Emprunt")
      * @ORM\JoinColumn(nullable=false)
      */
     private $exemplaire;

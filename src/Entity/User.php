@@ -4,13 +4,32 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
- * @ApiResource
+ * @ApiResource(
+ *      attributes={
+ *          "pagination_enabled"=true,
+ *          "order": {"nom":"asc"}
+ *      },
+ *     collectionOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"post"={"denormalization_context"={"groups"={"user:write"}}}},
+ *     itemOperations={"passwordChange"={"security" = "is_granted('USER_PATCH', object)","denormalization_context"={"groups"={"customOperationPassword:write"}},"method"="patch", "path"="/users/{id}/passwordchange","controller"="App\Controller\UserChangePasswordController"},"get" = { "security" = "is_granted('USER_GET', object)" },"delete"={"security"="is_granted('ROLE_ADMIN')"},"put" = {"denormalization_context"={"groups"={"user:write"}}, "security" = "is_granted('USER_PUT', object)" },"patch" = {"denormalization_context"={"groups"={"user:write"}}, "security" = "is_granted('USER_PATCH', object)" }},
+ *     normalizationContext={"groups"={"user:read"}},
+ *     
+ * )
+ * @ApiFilter(
+ *      SearchFilter::class, properties={"nom":"partial","email":"partial","etablissement":"partial","classe":"partial","prenom":"partial","dateNaissance":"partial","adresse":"partial","createdAt":"partial"}
+ * )
+ * @ApiFilter(
+ *      OrderFilter::class
+ * )
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
 class User implements UserInterface
@@ -19,57 +38,78 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"user:read","user:write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Groups({"user:read","user:write"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="json")
+     * @Groups({"user:read","admin:write"})
      */
     private $roles = [];
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Groups({"user:write"})
      */
     private $password;
 
     /**
+     * @Groups({"customOperationPassword:write"})
+     */
+    private $newPassword;
+
+    /**
+     * @Groups({"customOperationPassword:write"})
+     */
+    private $oldPassword;
+
+    /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"user:read","user:write"})
      */
     private $etablissement;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"user:read","user:write"})
      */
     private $classe;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user:read","user:write"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user:read","user:write"})
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="date")
+     * @Groups({"user:read","user:write"})
      */
     private $dateNaissance;
 
     /**
-     * @ORM\Column(type="binary")
+     * @ORM\Column(type="boolean")
+     * @Groups({"user:read","user:write"})
      */
     private $genre;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user:read","user:write"})
      */
     private $adresse;
 
@@ -80,12 +120,14 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Emprunt::class, mappedBy="User")
+     * @Groups({"user:read","admin:write"})
      */
     private $emprunts;
 
     public function __construct()
     {
         $this->emprunts = new ArrayCollection();
+        $this->createdAt = new \DateTime('now');
     }
 
     public function getId(): ?int
@@ -149,6 +191,31 @@ class User implements UserInterface
         return $this;
     }
 
+
+    public function getNewPassword(): string
+    {
+        return $this->newPassword;
+    }
+
+    public function setNewPassword(string $newPassword): self
+    {
+        $this->newPassword = $newPassword;
+
+        return $this;
+    }
+
+    public function getOldPassword(): string
+    {
+        return $this->oldPassword;
+    }
+
+    public function setOldPassword(string $oldPassword): self
+    {
+        $this->oldPassword = $oldPassword;
+
+        return $this;
+    }
+
     /**
      * @see UserInterface
      */
@@ -163,7 +230,7 @@ class User implements UserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        //$this->newPassword = null;
     }
 
     public function getEtablissement(): ?string

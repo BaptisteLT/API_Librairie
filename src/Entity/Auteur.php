@@ -4,12 +4,29 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\AuteurRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
- * @ApiResource
+ * @ApiResource(
+ *      attributes={
+ *          "pagination_enabled"=true,
+ *          "order": {"editeur":"nom"},
+ *      },
+ *     collectionOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"post"={"security"="is_granted('ROLE_ADMIN')"}},
+ *     itemOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"delete"={"security"="is_granted('ROLE_ADMIN')"},"put"={"security"="is_granted('ROLE_ADMIN')"},"patch"={"security"="is_granted('ROLE_ADMIN')"}},
+ * )
+ * @ApiFilter(
+ *      SearchFilter::class, properties={"nom":"partial","prenom":"partial","dateNaissance":"partial","livre.titre":"partial"}
+ * )
+ * @ApiFilter(
+ *      OrderFilter::class
+ * )
  * @ORM\Entity(repositoryClass=AuteurRepository::class)
  */
 class Auteur
@@ -23,21 +40,25 @@ class Auteur
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"post"})
+     * @Groups({"livre:read","livre:write"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"livre:read","livre:write"})
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="date", nullable=true)
+     * @Groups({"livre:read","livre:write"})
      */
     private $dateNaissance;
 
     /**
-     * @ORM\OneToMany(targetEntity=livre::class, mappedBy="auteur")
+     * @ORM\OneToMany(targetEntity=Livre::class, mappedBy="auteur")
      */
     private $livre;
 
@@ -88,7 +109,7 @@ class Auteur
     }
 
     /**
-     * @return Collection|livre[]
+     * @return Collection|Livre[]
      */
     public function getLivre(): Collection
     {

@@ -4,12 +4,31 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\LivreRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
- * @ApiResource
+ * @ApiResource(
+ *      attributes={
+ *          "pagination_enabled"=true,
+ *          "order": {"titre":"asc"}
+ *      },
+ *     collectionOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"post"={"security"="is_granted('ROLE_ADMIN')"}},
+ *     itemOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"delete"={"security"="is_granted('ROLE_ADMIN')"},"put"={"security"="is_granted('ROLE_ADMIN')"},"patch"={"security"="is_granted('ROLE_ADMIN')"}},
+ *     normalizationContext={"groups"={"livre:read"}},
+ *     denormalizationContext={"groups"={"livre:write"}}
+ * )
+ * @ApiFilter(
+ *      SearchFilter::class, properties={"titre":"partial","anneePublication":"partial","genre.type":"partial","auteur.nom":"partial","auteur.prenom":"partial","editeur.nom":"partial"}
+ * )
+ * @ApiFilter(
+ *      OrderFilter::class
+ * )
  * @ORM\Entity(repositoryClass=LivreRepository::class)
  */
 class Livre
@@ -23,39 +42,56 @@ class Livre
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"livre:read","livre:write"})
      */
     private $titre;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"livre:read","livre:write"})
      */
     private $nbPages;
 
     /**
      * @ORM\Column(type="date", nullable=true)
+     * @Groups({"livre:read","livre:write"})
      */
     private $anneePublication;
 
     /**
-     * @ORM\OneToMany(targetEntity=exemplaire::class, mappedBy="livre", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Exemplaire::class, mappedBy="livre", orphanRemoval=true, cascade={"persist"})
+     * @Groups({"livre:read","livre:write"})
      */
     private $exemplaire;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Auteur::class, inversedBy="livre")
+     * @ORM\ManyToOne(targetEntity=Auteur::class, inversedBy="livre", cascade={"persist"})
+     * @Groups({"livre:read","livre:write"})
      */
     private $auteur;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Genre::class, inversedBy="livre")
+     * @ORM\ManyToOne(targetEntity=Genre::class, inversedBy="livre", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"livre:read","livre:write"})
      */
     private $genre;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Editeur::class, inversedBy="livre")
+     * @ORM\ManyToOne(targetEntity=Editeur::class, inversedBy="livre", cascade={"persist"})
+     * @Groups({"livre:read","livre:write"})
      */
     private $editeur;
+
+
+    /**
+     * @Groups({"livre:read"})
+    */
+    public function getCountExemplaires(): int
+    {
+        
+        return count($this->exemplaire);
+    }
 
     public function __construct()
     {
@@ -104,7 +140,7 @@ class Livre
     }
 
     /**
-     * @return Collection|exemplaire[]
+     * @return Collection|Exemplaire[]
      */
     public function getExemplaire(): Collection
     {

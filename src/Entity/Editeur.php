@@ -4,12 +4,25 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\EditeurRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
- * @ApiResource
+ * @ApiResource(
+ *      attributes={
+ *          "pagination_enabled"=true,
+ *          "order": {"editeur":"nom"}
+ *      }
+ * ),
+ *     collectionOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"post"={"security"="is_granted('ROLE_ADMIN')"}},
+ *     itemOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"delete"={"security"="is_granted('ROLE_ADMIN')"},"put"={"security"="is_granted('ROLE_ADMIN')"},"patch"={"security"="is_granted('ROLE_ADMIN')"}}
+ * @ApiFilter(
+ *      SearchFilter::class, properties={"nom":"partial"}
+ * )
  * @ORM\Entity(repositoryClass=EditeurRepository::class)
  */
 class Editeur
@@ -23,11 +36,12 @@ class Editeur
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"livre:read","livre:write"})
      */
     private $nom;
 
     /**
-     * @ORM\OneToMany(targetEntity=livre::class, mappedBy="editeur")
+     * @ORM\OneToMany(targetEntity=Livre::class, mappedBy="editeur")
      */
     private $livre;
 
@@ -54,7 +68,7 @@ class Editeur
     }
 
     /**
-     * @return Collection|livre[]
+     * @return Collection|Livre[]
      */
     public function getLivre(): Collection
     {

@@ -4,12 +4,25 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ExemplaireRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
- * @ApiResource
+ * @ApiResource(
+ *      attributes={
+ *          "pagination_enabled"=true,
+ *          "order": {"dateAjout":"asc"}
+ *      },
+ *     collectionOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"post"={"security"="is_granted('ROLE_ADMIN')"}},
+ *     itemOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"delete"={"security"="is_granted('ROLE_ADMIN')"},"put"={"security"="is_granted('ROLE_ADMIN')"},"patch"={"security"="is_granted('ROLE_ADMIN')"}}
+ * )
+ * @ApiFilter(
+ *      OrderFilter::class
+ * )
  * @ORM\Entity(repositoryClass=ExemplaireRepository::class)
  */
 class Exemplaire
@@ -23,8 +36,9 @@ class Exemplaire
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"livre:read","livre:write"})
      */
-    private $num_exemplaire;
+    private $numExemplaire;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -32,7 +46,7 @@ class Exemplaire
     private $dateAjout;
 
     /**
-     * @ORM\OneToMany(targetEntity=emprunt::class, mappedBy="exemplaire")
+     * @ORM\OneToMany(targetEntity=Emprunt::class, mappedBy="exemplaire")
      */
     private $emprunt;
 
@@ -45,6 +59,7 @@ class Exemplaire
     public function __construct()
     {
         $this->emprunt = new ArrayCollection();
+        $this->dateAjout = new \DateTime('now');
     }
 
     public function getId(): ?int
@@ -52,14 +67,16 @@ class Exemplaire
         return $this->id;
     }
 
+
+
     public function getNumExemplaire(): ?int
     {
-        return $this->num_exemplaire;
+        return $this->numExemplaire;
     }
 
-    public function setNumExemplaire(int $num_exemplaire): self
+    public function setNumExemplaire(int $numExemplaire): self
     {
-        $this->num_exemplaire = $num_exemplaire;
+        $this->numExemplaire = $numExemplaire;
 
         return $this;
     }
@@ -77,7 +94,7 @@ class Exemplaire
     }
 
     /**
-     * @return Collection|emprunt[]
+     * @return Collection|Emprunt[]
      */
     public function getEmprunt(): Collection
     {
