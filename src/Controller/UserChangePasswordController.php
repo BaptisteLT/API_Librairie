@@ -42,7 +42,7 @@ class UserChangePasswordController
 
     public function __invoke(User $data)
     {
-        //Récupère le mot de passe tapé par l'utilisateur
+        //Récupère le mot de passe tapé par l'utilisateur.
         $oldPassword=$data->getOldPassword();
         //Récupère le nouveau mot de passe tapé par l'utilisateur
         $newPassword=$data->getNewPassword();
