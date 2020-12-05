@@ -18,7 +18,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  *          "order": {"dateAjout":"asc"}
  *      },
  *     collectionOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"post"={"security"="is_granted('ROLE_ADMIN')"}},
- *     itemOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"delete"={"security"="is_granted('ROLE_ADMIN')"},"put"={"security"="is_granted('ROLE_ADMIN')"},"patch"={"security"="is_granted('ROLE_ADMIN')"}}
+ *     itemOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"delete"={"security"="is_granted('ROLE_ADMIN')"},"put"={"security"="is_granted('ROLE_ADMIN')"},"patch"={"security"="is_granted('ROLE_ADMIN')"}},
+ *     denormalizationContext={"groups"={"exemplaire:write"}}
  * )
  * @ApiFilter(
  *      OrderFilter::class
@@ -51,6 +52,7 @@ class Exemplaire
     private $emprunt;
 
     /**
+     * @Groups({"exemplaire:write"})
      * @ORM\ManyToOne(targetEntity=Livre::class, inversedBy="exemplaire")
      * @ORM\JoinColumn(nullable=false)
      */

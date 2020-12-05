@@ -19,22 +19,23 @@ class ExemplaireRepository extends ServiceEntityRepository
         parent::__construct($registry, Exemplaire::class);
     }
 
-    // /**
-    //  * @return Exemplaire[] Returns an array of Exemplaire objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+    * @return Exemplaire[] Returns an array of Exemplaire objects
+    */
+    
+    public function findLastExemplaireOfTheBook($livreId)
     {
         return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
+            ->select('e.numExemplaire')
+            ->andWhere('e.livre = :livreid')
+            ->setParameter('livreid', $livreId)
+            ->orderBy('e.numExemplaire', 'DESC')
+            ->setMaxResults(1)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
+    
 
     /*
     public function findOneBySomeField($value): ?Exemplaire
