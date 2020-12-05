@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 class PasswordEncoderSubscriber implements EventSubscriberInterface
 {
     /**
-     * Encoder
+     * Encodeur
      *
      * @var UserPasswordEncoderInterface
      */
