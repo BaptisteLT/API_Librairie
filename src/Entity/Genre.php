@@ -18,7 +18,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "order": {"type":"asc"}
  *      },
  *     collectionOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"post"={"security"="is_granted('ROLE_ADMIN')"}},
- *     itemOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"delete"={"security"="is_granted('ROLE_ADMIN')"},"put"={"security"="is_granted('ROLE_ADMIN')"},"patch"={"security"="is_granted('ROLE_ADMIN')"}}
+ *     itemOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"delete"={"security"="is_granted('ROLE_ADMIN')"},"put"={"security"="is_granted('ROLE_ADMIN')"},"patch"={"security"="is_granted('ROLE_ADMIN')"}},
+ *     denormalizationContext={"groups"={"genre:write"}}
  * )
  * @ApiFilter(
  *      SearchFilter::class, properties={"type":"partial"}
@@ -36,7 +37,7 @@ class Genre
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"livre:read"})
+     * @Groups({"livre:read","genre:write"})
      */
     private $type;
 

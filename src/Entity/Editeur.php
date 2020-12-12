@@ -16,10 +16,11 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *      attributes={
  *          "pagination_enabled"=true,
  *          "order": {"editeur":"nom"}
- *      }
- * ),
+ *      },
  *     collectionOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"post"={"security"="is_granted('ROLE_ADMIN')"}},
- *     itemOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"delete"={"security"="is_granted('ROLE_ADMIN')"},"put"={"security"="is_granted('ROLE_ADMIN')"},"patch"={"security"="is_granted('ROLE_ADMIN')"}}
+ *     itemOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"delete"={"security"="is_granted('ROLE_ADMIN')"},"put"={"security"="is_granted('ROLE_ADMIN')"},"patch"={"security"="is_granted('ROLE_ADMIN')"}},
+ *     denormalizationContext={"groups"={"editeur:write"}}
+ * )
  * @ApiFilter(
  *      SearchFilter::class, properties={"nom":"partial"}
  * )
@@ -36,7 +37,7 @@ class Editeur
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"livre:read","livre:write"})
+     * @Groups({"livre:read","livre:write","editeur:write"})
      */
     private $nom;
 

@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\EmpruntRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
@@ -15,7 +16,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "order": {"createdAt":"asc"}
  *      },
  *     collectionOperations={"get"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"},"post"={"security"="is_granted('ROLE_ADMIN')"}},
- *     itemOperations={"get"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"},"delete"={"security"="is_granted('ROLE_ADMIN')"},"put"={"security"="is_granted('ROLE_ADMIN')"},"patch"={"security"="is_granted('ROLE_ADMIN')"}}
+ *     itemOperations={"get"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"},"delete"={"security"="is_granted('ROLE_ADMIN')"},"put"={"security"="is_granted('ROLE_ADMIN')"},"patch"={"security"="is_granted('ROLE_ADMIN')"}},
+ *     denormalizationContext={"groups"={"emprunt:write"}}
  * )
  * @ApiFilter(
  *      SearchFilter::class, properties={"rendu":"partial","createdAt":"partial","User.nom":"partial","User.prenom":"partial","User.email":"partial"}
@@ -41,20 +43,28 @@ class Emprunt
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"emprunt:write"})
      */
     private $rendu;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="Emprunts")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"emprunt:write"})
      */
     private $User;
 
     /**
      * @ORM\ManyToOne(targetEntity=Exemplaire::class, inversedBy="Emprunt")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"emprunt:write"})
      */
     private $exemplaire;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime('now');
+    }
 
     public function getId(): ?int
     {

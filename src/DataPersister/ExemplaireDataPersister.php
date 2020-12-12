@@ -16,17 +16,9 @@ final class ExemplaireDataPersister implements DataPersisterInterface
      */
     private $em;
 
-    /**
-     * Exemplaire Repository
-     *
-     * @var ExemplaireRepository
-     */
-    private $exemplaireRepository;
-
-    public function __construct(EntityManagerInterface $em, ExemplaireRepository $exemplaireRepository)
+    public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
-        $this->exemplaireRepository = $exemplaireRepository;
     }
 
     public function supports($data): bool
