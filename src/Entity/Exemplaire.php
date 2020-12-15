@@ -10,6 +10,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
@@ -37,7 +38,6 @@ class Exemplaire
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"livre:read","livre:write"})
      */
     private $numExemplaire;
 
@@ -55,6 +55,7 @@ class Exemplaire
      * @Groups({"exemplaire:write"})
      * @ORM\ManyToOne(targetEntity=Livre::class, inversedBy="exemplaire")
      * @ORM\JoinColumn(nullable=false)
+     * @Assert\NotBlank
      */
     private $livre;
 

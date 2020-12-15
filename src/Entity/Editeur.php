@@ -10,6 +10,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
@@ -38,6 +39,7 @@ class Editeur
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"livre:read","livre:write","editeur:write"})
+     * @Assert\NotBlank
      */
     private $nom;
 

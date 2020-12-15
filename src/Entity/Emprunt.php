@@ -9,6 +9,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
@@ -44,6 +45,8 @@ class Emprunt
     /**
      * @ORM\Column(type="boolean")
      * @Groups({"emprunt:write"})
+     * @Assert\NotNull
+     * @Assert\Type("bool")
      */
     private $rendu;
 
@@ -51,6 +54,7 @@ class Emprunt
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="Emprunts")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"emprunt:write"})
+     * @Assert\NotBlank
      */
     private $User;
 
@@ -58,6 +62,7 @@ class Emprunt
      * @ORM\ManyToOne(targetEntity=Exemplaire::class, inversedBy="Emprunt")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"emprunt:write"})
+     * @Assert\NotBlank
      */
     private $exemplaire;
 

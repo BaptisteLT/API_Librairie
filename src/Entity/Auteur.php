@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
@@ -43,18 +44,21 @@ class Auteur
      * @ORM\Column(type="string", length=255)
      * @Groups({"post"})
      * @Groups({"livre:read","livre:write","auteur:write"})
+     * @Assert\NotBlank
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"livre:read","livre:write","auteur:write"})
+     * @Assert\NotBlank
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="date", nullable=true)
      * @Groups({"livre:read","livre:write","auteur:write"})
+     * @Assert\NotBlank
      */
     private $dateNaissance;
 

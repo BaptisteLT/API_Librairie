@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
@@ -43,30 +44,35 @@ class Livre
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"livre:read","livre:write"})
+     * @Assert\NotBlank
      */
     private $titre;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      * @Groups({"livre:read","livre:write"})
+     * @Assert\NotBlank(allowNull=true)
      */
     private $nbPages;
 
     /**
      * @ORM\Column(type="date", nullable=true)
      * @Groups({"livre:read","livre:write"})
+     * @Assert\NotBlank(allowNull=true)
      */
     private $anneePublication;
 
     /**
      * @ORM\OneToMany(targetEntity=Exemplaire::class, mappedBy="livre", orphanRemoval=true, cascade={"persist"})
-     * @Groups({"livre:read","livre:write"})
+     * @Groups({"livre:read"})
+     * @Assert\NotBlank(allowNull=true)
      */
     private $exemplaire;
 
     /**
      * @ORM\ManyToOne(targetEntity=Auteur::class, inversedBy="livre", cascade={"persist"})
      * @Groups({"livre:read","livre:write"})
+     * @Assert\NotBlank(allowNull=true)
      */
     private $auteur;
 
@@ -74,12 +80,14 @@ class Livre
      * @ORM\ManyToOne(targetEntity=Genre::class, inversedBy="livre", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"livre:read","livre:write"})
+     * @Assert\NotBlank
      */
     private $genre;
 
     /**
      * @ORM\ManyToOne(targetEntity=Editeur::class, inversedBy="livre", cascade={"persist"})
      * @Groups({"livre:read","livre:write"})
+     * @Assert\NotBlank(allowNull=true)
      */
     private $editeur;
 

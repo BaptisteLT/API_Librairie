@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
@@ -19,8 +20,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "pagination_enabled"=true,
  *          "order": {"nom":"asc"}
  *      },
- *     collectionOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"post"={"denormalization_context"={"groups"={"user:write"}}}},
- *     itemOperations={"passwordChange"={"security" = "is_granted('USER_PATCH', object)","denormalization_context"={"groups"={"customOperationPassword:write"}},"method"="patch", "path"="/users/{id}/passwordchange","controller"="App\Controller\UserChangePasswordController"},"get" = { "security" = "is_granted('USER_GET', object)" },"delete"={"security"="is_granted('ROLE_ADMIN')"},"put" = {"denormalization_context"={"groups"={"user:write"}}, "security" = "is_granted('USER_PUT', object)" },"patch" = {"denormalization_context"={"groups"={"user:write"}}, "security" = "is_granted('USER_PATCH', object)" }},
+ *     collectionOperations={"get"={"security"="is_granted('ROLE_ADMIN')"},"post"={"validation_groups"={"Default", "postValidation"},"denormalization_context"={"groups"={"user:write"}}}},
+ *     itemOperations={"passwordChange"={"validation_groups"={"Default", "passwordValidation"},"security" = "is_granted('USER_PATCH', object)","denormalization_context"={"groups"={"customOperationPassword:write"}},"method"="patch", "path"="/users/{id}/passwordchange","controller"="App\Controller\UserChangePasswordController"},"get" = { "security" = "is_granted('USER_GET', object)" },"delete"={"security"="is_granted('ROLE_ADMIN')"},"put" = {"validation_groups"={"Default", "editValidation"},"denormalization_context"={"groups"={"user:write"}}, "security" = "is_granted('USER_PUT', object)" },"patch" = {"validation_groups"={"Default", "editValidation"},"denormalization_context"={"groups"={"user:write"}}, "security" = "is_granted('USER_PATCH', object)" }},
  *     normalizationContext={"groups"={"user:read"}},
  *     
  * )
@@ -45,12 +46,14 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      * @Groups({"user:read","user:write"})
+     * @Assert\NotBlank(groups={"postValidation","editValidation"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="json")
      * @Groups({"user:read","admin:write"})
+     * @Assert\NotBlank(groups={"editValidation"},allowNull=true)
      */
     private $roles = [];
 
@@ -58,58 +61,69 @@ class User implements UserInterface
      * @var string The hashed password
      * @ORM\Column(type="string")
      * @Groups({"user:write"})
+     * @Assert\NotBlank(groups={"postValidation","editValidation"})
      */
     private $password;
 
     /**
      * @Groups({"customOperationPassword:write"})
+     * @Assert\NotBlank(groups={"passwordValidation"})
      */
     private $newPassword;
 
     /**
      * @Groups({"customOperationPassword:write"})
+     * @Assert\NotBlank(groups={"passwordValidation"})
      */
     private $oldPassword;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"user:read","user:write"})
+     * @Assert\NotBlank(groups={"postValidation","editValidation"},allowNull=true)
      */
     private $etablissement;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"user:read","user:write"})
+     * @Assert\NotBlank(groups={"postValidation","editValidation"},allowNull=true)
      */
     private $classe;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"user:read","user:write"})
+     * @Assert\NotBlank(groups={"postValidation","editValidation"})
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"user:read","user:write"})
+     * @Assert\NotBlank(groups={"postValidation","editValidation"})
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="date")
      * @Groups({"user:read","user:write"})
+     * @Assert\NotBlank(groups={"postValidation","editValidation"})
      */
     private $dateNaissance;
 
     /**
      * @ORM\Column(type="boolean")
      * @Groups({"user:read","user:write"})
+     * @Assert\Type("bool")
+     * @Assert\NotNull(groups={"postValidation","editValidation"})
      */
     private $genre;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"user:read","user:write"})
+     * @Assert\NotBlank(groups={"postValidation","editValidation"})
      */
     private $adresse;
 
@@ -121,6 +135,7 @@ class User implements UserInterface
     /**
      * @ORM\OneToMany(targetEntity=Emprunt::class, mappedBy="User")
      * @Groups({"user:read","admin:write"})
+     * @Assert\NotBlank(groups={"editValidation"},allowNull=true)
      */
     private $emprunts;
 
