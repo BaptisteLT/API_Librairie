@@ -33,7 +33,6 @@ class AppFixtures extends Fixture
         $faker = Factory::create('fr_FR');
 
 
-
         for($l = 0; $l<25;$l++)
         {
 
@@ -194,7 +193,12 @@ class AppFixtures extends Fixture
 
             $manager->persist($livre);
         }
+        $auteurUnique = new Auteur();
+        $auteurUnique->setNom($faker->name())
+               ->setPrenom($faker->firstName())
+               ->setDateNaissance($faker->dateTime());
 
+        $manager->persist($auteurUnique);
         // $product = new Product();
         // $manager->persist($product);
 

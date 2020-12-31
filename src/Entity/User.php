@@ -68,6 +68,13 @@ class User implements UserInterface
     /**
      * @Groups({"customOperationPassword:write"})
      * @Assert\NotBlank(groups={"passwordValidation"})
+     * @Assert\Length(
+     *      groups={"passwordValidation"},
+     *      min = 7,
+     *      max = 255,
+     *      minMessage = "Your password must be at least {{ limit }} characters long",
+     *      maxMessage = "Your password cannot be longer than {{ limit }} characters"
+     * )
      */
     private $newPassword;
 
